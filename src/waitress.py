@@ -22,8 +22,8 @@ for item in data:
     props.append(", ".join(prop))
 
 log.info(f'{len(data)} Products available:')
-for p in props:
-    print(f'    - {p}')
+for message in props:
+    print(f'    - {message}')
 products_list = ','.join(props)
 
 restobot=f"""

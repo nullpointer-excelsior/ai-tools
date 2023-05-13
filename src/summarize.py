@@ -77,8 +77,9 @@ def text_processor(text, words, sentences, tone, audience, style, markdown, verb
     
     if verbose:
         summary = get_summary_verbose(prompt)
-        pyperclip.copy(summary)
-        log.info('Resumen copiado al portapapeles!\n\n')
+        if not no_clipboard:
+            pyperclip.copy(summary)
+            log.info('Resumen copiado al portapapeles!\n\n')
     else:
         response = get_completion(prompt=prompt)
         print(response['answer'])
