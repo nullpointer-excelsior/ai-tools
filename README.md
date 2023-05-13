@@ -4,7 +4,7 @@ Aplicaciones de utilidad basados en Chatgpt y otras herramientas
 
 ### Requisitos
 
-Python 3.6 o superior
+Python 3.10 o superior
 Paquete Click
 Paquete OpenAI
 
@@ -25,8 +25,9 @@ pip install -r requirements.txt
 
 * waitress: recomendar cervezas desde una API
 * summarize: resume textos y los traduce siu es necesario
+* simple_assistant: ChatGPT por CLI
 
-## summarize script
+## `summarize:`
 
 Este script de Python permite resumir un texto utilizando ChatGPT y varias opciones.
 
@@ -55,5 +56,21 @@ export OPENAI_API_KEY=""
 
 # run your summary
 python src/summarize.py "Este es un ejemplo de texto que se desea resumir" -w 10 -s 2 -t neutral -a estudiantes -st informativo -md
+
+```
+
+## `simple_assistant:`
+
+Simple asitente sin ningun prompt especial, util para usar chatGPT en la terminal
+
+### Ejemplo
+```bash
+#!/bin/bash
+
+# define your openai apikey
+export OPENAI_API_KEY=""
+
+# run your summary
+python src/simple_assistant.py 
 
 ```
