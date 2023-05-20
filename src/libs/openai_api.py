@@ -12,8 +12,7 @@ def ask_to_chatgpt(messages, model="gpt-3.5-turbo", temperature=0):
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
-        temperature=temperature,
-        max_tokens=200
+        temperature=temperature
     )
     return {
         'total_token': response['usage']['total_tokens'],

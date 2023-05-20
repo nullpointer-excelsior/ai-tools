@@ -5,7 +5,7 @@ from colorama import Fore, Style
 import sys, select
 
 
-def get_instructions(words, sentences, tone, audience, style, markdown):
+def get_instructions(words, sentences, tone, audience, style, markdown, translate):
     instructions = []
     if words:
         instructions.append(f' - El resumen no debe tener más de {words} palabras.')
@@ -19,6 +19,8 @@ def get_instructions(words, sentences, tone, audience, style, markdown):
         instructions.append(f' - El resumen debe tener un tono {tone}.')
     if markdown:
         instructions.append(' - El resumen debe estar formato markdown.')
+    if translate:
+        instructions.append(' - El resumen debe ser traducido al español si es necesario.')
     return instructions
 
 
@@ -26,6 +28,8 @@ def get_prompt(text, instructions):
     if len(instructions) > 0:
         instructions_list = '\n'.join(instructions)
         instructions_text = f'El resumen debe seguir las siguientes instrucciones:\n{instructions_list}'
+    else:
+        instructions_text = ''
     return f"""Tu tarea sera resumir el texto encerrado en triple acento grave.\n{instructions_text}\n```{text}```."""
 
 
@@ -38,7 +42,8 @@ def get_summary_verbose(prompt):
     instructions = '\n'.join([l for l in initial_prompt.split('\n') if l.strip().startswith('-')])
     log.info('Summarize text with ChatGPT')
     print(f'\nTexto:\n\n{Fore.CYAN}{text}{Style.RESET_ALL}\n\n')
-    print(f"Instrucciones:\n\n{Fore.CYAN}{instructions}{Style.RESET_ALL}\n\n")
+    if instructions != '':
+        print(f"Instrucciones:\n\n{Fore.CYAN}{instructions}{Style.RESET_ALL}\n\n")
     p1 = log.progress('Creando resumen')
     p1.status(f'{Fore.GREEN}ChatGPT esta pensando...{Style.RESET_ALL}')
     try:
@@ -61,7 +66,8 @@ def get_summary_verbose(prompt):
 @click.option('--markdown', '-md', type=str, is_flag=True, help='Formato de salida mardown')
 @click.option('--verbose','-v', is_flag=True, help='Muestra el resumen detallado')
 @click.option('--no-clipboard', '-nc', is_flag=True, help='No copia al clipboard')
-def text_processor(text, words, sentences, tone, audience, style, markdown, verbose, no_clipboard):
+@click.option('--translate', '-tr', is_flag=True, help='Traduce si es necesario')
+def text_processor(text, words, sentences, tone, audience, style, markdown, verbose, no_clipboard, translate):
     """
     Resume un texto con ChatGPT y diversas opciones.
     """
@@ -72,7 +78,7 @@ def text_processor(text, words, sentences, tone, audience, style, markdown, verb
             log.error('No se ha proporcionado ningún texto.')
             return
     
-    instructions = get_instructions(words, sentences, tone, audience, style, markdown)
+    instructions = get_instructions(words, sentences, tone, audience, style, markdown, translate)
     prompt = get_prompt(text, instructions)
     
     if verbose:
