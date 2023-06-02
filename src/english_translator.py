@@ -1,6 +1,7 @@
 import click, pyperclip
 from pwn import log
-from libs.openai_api import get_completion
+from libs.openai_api import get_completion, get_completion_stream
+from libs.utils import print_stream
 import sys, select
 
 
@@ -11,13 +12,13 @@ def get_prompt(text):
         Devolveras un resumen con los errores y sugerencias en formato markdown. finalmente devolveras el texto correjido en ingles encerrado en triple acento grave.
     """
 
-def copy_response(text: str):
+def copy_response(text: str, progress):
     try:
         text_to_copy = text.split('```')[1]
         pyperclip.copy(text_to_copy)
-        log.info('Texto copiado al portapapeles.')
+        progress.success('Texto copiado al portapapeles.')
     except:
-        log.error('Texto no pudo ser copiado al portapapeles.')
+        progress.error('Texto no pudo ser copiado al portapapeles.')
 
 @click.command()
 @click.argument('text', default=None, required=False)
@@ -33,11 +34,20 @@ def translate(text, explain):
             log.error('No se ha proporcionado ningún texto.')
             return
     print()
-    log.info('Pensando...')
+    progress = log.progress('Openai ChatGPT')
+    progress.status('Conectando...')
+    print()
     prompt = get_prompt(text)
-    answer = get_completion(prompt=prompt)['answer']
-    copy_response(answer)
-    print(f"\n{answer}\n")
+    complete_response = ''
+    stream_initialized = False
+    for st in get_completion_stream(prompt):
+        if not stream_initialized:
+            progress.status('Escribiendo...')
+            stream_initialized = True
+        print_stream(st)
+        complete_response += st
+    copy_response(complete_response, progress)
+    print('\n')
        
 
 if __name__ == "__main__":
