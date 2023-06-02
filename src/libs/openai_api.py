@@ -25,6 +25,24 @@ def get_completion(prompt, model="gpt-3.5-turbo", temperature=0):
     return ask_to_chatgpt(messages=messages, model=model, temperature=temperature)
 
 
+def ask_to_chatgpt_stream(messages, model="gpt-3.5-turbo", temperature=0):
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=temperature,
+        stream=True
+    )
+    for chunk in response:
+        delta = chunk['choices'][0]['delta']
+        answer = delta.get('content', '')
+        yield answer
+
+
+def get_completion_stream(prompt, model="gpt-3.5-turbo", temperature=0):
+    messages = [{"role": "user", "content": prompt}]
+    return ask_to_chatgpt_stream(messages=messages, model=model, temperature=temperature)
+
+
 def is_command(user_input: str, command: str):
     return user_input.lower().strip() == command
 
