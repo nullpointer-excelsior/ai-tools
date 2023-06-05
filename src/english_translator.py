@@ -1,6 +1,6 @@
 import click, pyperclip
 from pwn import log
-from libs.openai_api import get_completion, get_completion_stream
+from libs.openai_api import get_completion_stream
 from libs.utils import print_stream
 import sys, select
 
@@ -40,12 +40,12 @@ def translate(text, explain):
     prompt = get_prompt(text)
     complete_response = ''
     stream_initialized = False
-    for st in get_completion_stream(prompt):
+    for stream in get_completion_stream(prompt):
         if not stream_initialized:
             progress.status('Escribiendo...')
             stream_initialized = True
-        print_stream(st)
-        complete_response += st
+        print_stream(stream)
+        complete_response += stream
     copy_response(complete_response, progress)
     print('\n')
        
