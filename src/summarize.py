@@ -1,6 +1,8 @@
 import click, pyperclip
 from pwn import log
-from libs.openai_api import get_completion
+from libs.colored import cyan_color
+from libs.openai_api import get_completion, get_completion_stream
+from libs.utils import print_stream
 from colorama import Fore, Style
 import sys, select
 
@@ -43,16 +45,24 @@ def get_summary_verbose(prompt):
     log.info('Summarize text with ChatGPT')
     print(f'\nTexto:\n\n{Fore.CYAN}{text}{Style.RESET_ALL}\n\n')
     if instructions != '':
-        print(f"Instrucciones:\n\n{Fore.CYAN}{instructions}{Style.RESET_ALL}\n\n")
-    p1 = log.progress('Creando resumen')
-    p1.status(f'{Fore.GREEN}ChatGPT esta pensando...{Style.RESET_ALL}')
+        print(f"Instrucciones:\n\n{cyan_color(instructions)}\n\n")
+    p1 = log.progress('Resumen')
+    p1.status(f'{Fore.GREEN}Conectando con ChatGPT...{Style.RESET_ALL}')
+    answer = ''
     try:
-        response = get_completion(prompt=prompt)
+        print()
+        streaming = False
+        for stream in get_completion_stream(prompt=prompt):
+            if not streaming:
+                p1.status(f'{Fore.GREEN}ChatGPT Escribiendo...{Style.RESET_ALL}')
+                streaming = True
+            print_stream(f'{Fore.YELLOW}{stream}')
+            answer += stream  
+        print('\n')
         p1.success(f'{Fore.GREEN}Listo{Style.RESET_ALL}')
     except Exception as err:
+        print(f"{Style.RESET_ALL}\n")
         p1.error(f'ChatGPT no pudo procesar el texto: {str(err)}')
-    answer = response['answer']
-    print(f"\nResumen:\n\n{Fore.YELLOW}{answer}{Style.RESET_ALL}\n")
     return answer
 
 
@@ -87,8 +97,10 @@ def text_processor(text, words, sentences, tone, audience, style, markdown, verb
             pyperclip.copy(summary)
             log.info('Resumen copiado al portapapeles!\n\n')
     else:
-        response = get_completion(prompt=prompt)
-        print(response['answer'])
+        stream = get_completion_stream(prompt=prompt)
+        for s in stream:
+            print_stream(s)
+        print()
        
 
 if __name__ == "__main__":

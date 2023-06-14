@@ -1,9 +1,8 @@
-from typing import Callable, Any
 from pwn import log
-from colorama import Fore, Style
 import pyperclip
 from assistant.chatgpt import ChatGPT
 from assistant.context import ChatContext, Command
+from libs.colored import green_color, yellow_color
 
 
 class ResetAssistantCommand(Command):
@@ -39,11 +38,11 @@ def is_command(user_input: str, command: str):
 
 
 def command_info(commands):
-    command_list = '\t'.join([ f"[{Fore.GREEN}*{Style.RESET_ALL}] {Fore.YELLOW}{c.name}{Style.RESET_ALL}: {c.description}\n" for c in commands ])
+    command_list = '\t'.join([ f"[{green_color('*')}] {yellow_color(c.name)}: {c.description}\n" for c in commands ])
     return f"""
     Comandos disponibles:
 
-    [{Fore.GREEN}*{Style.RESET_ALL}] {Fore.YELLOW}exit{Style.RESET_ALL}: Salir del asistente.
+    [{green_color('*')}] {yellow_color('exit')}: Salir del asistente.
     {command_list}
     """
     
@@ -72,7 +71,7 @@ def command_line_assistant(prompt: str, custom_commands: list[Command] = []):
         assistant_progress.success('Asistente listo!')
         print(command_info(commands))
         while True:
-            user_input = input(f'{Fore.GREEN}\n[Assistant]: {Style.RESET_ALL}{assistant_input}\n\n{Fore.GREEN}[User]: {Style.RESET_ALL}')
+            user_input = input(f"{green_color('[Assistant]')}{assistant_input}\n\n{green_color('[User]')}")
             print()
             context.progress('Estado chat context')
             # exit command
