@@ -18,7 +18,7 @@ def copy_response(text: str, progress):
         pyperclip.copy(text_to_copy)
         progress.success('Texto copiado al portapapeles.')
     except:
-        progress.error('Texto no pudo ser copiado al portapapeles.')
+        print('Texto no pudo ser copiado al portapapeles.')
 
 @click.command()
 @click.argument('text', default=None, required=False)

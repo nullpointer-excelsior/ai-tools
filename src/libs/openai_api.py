@@ -9,14 +9,14 @@ import pyperclip
 openai.api_key = os.environ['OPENAI_API_KEY']
 
 
-class ChatgptModel(Enum):
+class ChatGPTModel(Enum):
     GPT_3_5_TURBO = 'gpt-3.5-turbo'
     GPT_3_5_TURBO_16K = 'gpt-3.5-turbo-16k'
     GPT_4 = 'gpt-4'
     GPT_4_32K = 'gpt-4-32k'
 
 
-def ask_to_chatgpt(messages, model=ChatgptModel.GPT_3_5_TURBO, temperature=0):
+def ask_to_chatgpt(messages, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):
     response = openai.ChatCompletion.create(
         model=model.value,
         messages=messages,
@@ -28,12 +28,12 @@ def ask_to_chatgpt(messages, model=ChatgptModel.GPT_3_5_TURBO, temperature=0):
     }
 
 
-def get_completion(prompt, model=ChatgptModel.GPT_3_5_TURBO, temperature=0): 
+def get_completion(prompt, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0): 
     messages = [{"role": "user", "content": prompt}]
     return ask_to_chatgpt(messages=messages, model=model, temperature=temperature)
 
 
-def ask_to_chatgpt_stream(messages, model=ChatgptModel.GPT_3_5_TURBO, temperature=0):
+def ask_to_chatgpt_stream(messages, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):
     response = openai.ChatCompletion.create(
         model=model.value,
         messages=messages,
@@ -46,7 +46,7 @@ def ask_to_chatgpt_stream(messages, model=ChatgptModel.GPT_3_5_TURBO, temperatur
         yield answer
 
 
-def get_completion_stream(prompt, model=ChatgptModel.GPT_3_5_TURBO, temperature=0):
+def get_completion_stream(prompt, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):
     messages = [{"role": "user", "content": prompt}]
     return ask_to_chatgpt_stream(messages=messages, model=model, temperature=temperature)
 
