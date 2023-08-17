@@ -5,11 +5,16 @@ from libs.utils import print_stream
 import sys, select
 
 
-def get_prompt(text):
+def get_assistant_prompt(text):
     return f"""
         Actua como un experto profesor en ingles y corrige el siguiente texto encerrado en triple acento grave ```{text}```. este texto puede estar en ingles o español deberas corregir si existe algun error
         y tambien puedes dar sugeriencias para mejorarlo.
         Devolveras un resumen con los errores y sugerencias en formato markdown. finalmente devolveras el texto correjido en ingles encerrado en triple acento grave.
+    """
+
+def get_translate_prompt(text):
+    return f"""
+        Traduce el siguiente texto al inglés ```{text}``` y dame la respuesta en triple acento grave.
     """
 
 def copy_response(text: str, progress):
@@ -18,12 +23,12 @@ def copy_response(text: str, progress):
         pyperclip.copy(text_to_copy)
         progress.success('Texto copiado al portapapeles.')
     except:
-        print('Texto no pudo ser copiado al portapapeles.')
+        print('\nTexto no pudo ser copiado al portapapeles.')
 
 @click.command()
 @click.argument('text', default=None, required=False)
-@click.option('--explain', '-e', type=str, help='Explica la corrección y da sugerencias', default=None)
-def translate(text, explain):
+@click.option('--translate', '-t', is_flag=True, help='Traduce al ingles el texto', default=False)
+def translate(text, translate):
     """
     Resume un texto con ChatGPT y diversas opciones.
     """
@@ -37,7 +42,7 @@ def translate(text, explain):
     progress = log.progress('Openai ChatGPT')
     progress.status('Conectando...')
     print()
-    prompt = get_prompt(text)
+    prompt = get_assistant_prompt(text) if not translate else get_translate_prompt(text)
     complete_response = ''
     stream_initialized = False
     for stream in get_completion_stream(prompt):
