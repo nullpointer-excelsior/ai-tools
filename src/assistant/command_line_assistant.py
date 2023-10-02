@@ -50,12 +50,12 @@ class ChangeModelCommand(Command):
             elif model_input == 4:
                 model = ChatGPTModel.GPT_4_32K
             else:
-                context.assistant_input = f'Opción {model_input} invalida'
+                print(f'Opción {model_input} invalida')
                 return 
             context.update_model(model)
-            context.assistant_input = f'Modelo cambiado a {model_input}'
+            print(f'Modelo cambiado a {cyan_color(model)}')
         except ValueError:
-            context.assistant_input = f'Opción {model_input} invalida'
+            print(f'Opción {model_input} invalida')
 
 
 class HelpCommand(Command):
@@ -63,7 +63,18 @@ class HelpCommand(Command):
     description = 'Muestra los comandos disponibles.'
 
     def action(self, context: ChatContext, user_input: str):
-        context.assistant_input = f"\n{command_info(context.commands)}"
+        print(f"\n{command_info(context.commands)}")
+
+class DebugCommand(Command):
+    name = 'debug'
+    description = 'Muestra la configuracion del agente de ChatGPT'
+
+    def action(self, context: ChatContext, user_input: str):
+        messages = "\n\t".join([f"{m['role']}: {m['content']}" for m in context.messages])
+        print(f"""
+            {yellow_color('model')}: {context.chatgpt.model.value}
+            {yellow_color('messages')}: {messages}
+        """)
 
 
 def is_command(user_input: str, command: str):
@@ -85,7 +96,8 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
         ResetAssistantCommand(),
         CopyCommand(),
         ChangeModelCommand(),
-        HelpCommand()
+        HelpCommand(),
+        DebugCommand()
     ]
     commands += custom_commands
 
@@ -109,7 +121,7 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
         assistant_progress.success('Asistente listo!')
 
         while True:
-            user_input = input(f"{assistant_input}\n\n{green_color('[User] ')}")
+            user_input = input(f"\n\n{green_color('[User] ')}")
             print()
             context.progress('Estado chat context')
             # exit command
@@ -130,8 +142,8 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
 
             context.status('Pensando...')
             print_stream(f"\n{green_color('[Assistant] ')}")
-            for stream in context.asking_stream(user_input):
-                print_stream(stream)
+            for st in context.asking_stream(user_input):
+                print_stream(f"{cyan_color(st)}")
             context.success("Listo!")
 
 
