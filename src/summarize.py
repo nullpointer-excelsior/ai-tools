@@ -1,7 +1,7 @@
 import click, pyperclip
 from pwn import log
 from libs.colored import cyan_color
-from libs.openai_api import get_completion, get_completion_stream
+from libs.openai_api import get_completion_stream
 from libs.utils import print_stream
 from colorama import Fore, Style
 import sys, select

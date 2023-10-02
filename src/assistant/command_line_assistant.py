@@ -2,7 +2,7 @@ from pwn import log
 import pyperclip
 from assistant.chatgpt import ChatGPT
 from assistant.chat_context import ChatContext, Command
-from libs.colored import green_color, yellow_color
+from libs.colored import cyan_color, green_color, yellow_color
 from libs.openai_api import ChatGPTModel
 
 
@@ -24,6 +24,37 @@ class CopyCommand(Command):
     def action(self, user_input: str, context: ChatContext):
         pyperclip.copy(context.assistant_input)
         context.assistant_input = 'Respuesta copiada al portapapeles!!'
+
+
+class ChangeModelCommand(Command):
+    name = 'model'
+    description = 'Actualiza el modelo del chat actual '
+
+    def action(self, user_input: str, context: ChatContext):
+        context.status('Seleccionar modelo')
+        model_input = int(input(f"""
+        Selecciona uno de los siguientes opciones:
+            {green_color('1')}) {yellow_color('gpt3')}
+            {green_color('2')}) {yellow_color('gpt3-16k')}
+            {green_color('3')}) {yellow_color('gpt4')}
+            {green_color('4')}) {yellow_color('gpt4-32k')}
+        """))
+        try:
+            if model_input == 1:
+                model = ChatGPTModel.GPT_3_5_TURBO
+            elif model_input == 2:
+                model = ChatGPTModel.GPT_3_5_TURBO_16K
+            elif model_input == 3:
+                model = ChatGPTModel.GPT_4
+            elif model_input == 4:
+                model = ChatGPTModel.GPT_4_32K
+            else:
+                context.assistant_input = f'Opción {model_input} invalida'
+                return 
+            context.update_model(model)
+            context.assistant_input = f'Modelo cambiado a {model_input}'
+        except ValueError:
+            context.assistant_input = f'Opción {model_input} invalida'
 
 
 class HelpCommand(Command):
@@ -52,6 +83,7 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
     commands = [
         ResetAssistantCommand(),
         CopyCommand(),
+        ChangeModelCommand(),
         HelpCommand()
     ]
     commands += custom_commands
@@ -71,7 +103,7 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
         assistant_progress.success('Asistente listo!')
         print(command_info(commands))
         while True:
-            user_input = input(f"{green_color('[Assistant]')}{assistant_input}\n\n{green_color('[User]')}")
+            user_input = input(f"{green_color('[Assistant] ')}{assistant_input}\n\n{green_color('[User] ')}")
             print()
             context.progress('Estado chat context')
             # exit command
@@ -85,7 +117,7 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
                     cmd.action(user_input=user_input, context=context)
                     assistant_input = context.assistant_input
                     command_executed = True
-                    context.success(f'Comando {cmd.name} ejecutado.')
+                    context.success(f'Comando {cyan_color(cmd.name)} ejecutado.')
                     break
             if command_executed:
                 continue

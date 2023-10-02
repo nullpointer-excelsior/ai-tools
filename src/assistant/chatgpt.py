@@ -25,3 +25,7 @@ class ChatGPT:
         return self.chat_completion(messages=messages, temperature=temperature)
     
 
+    def update_model(self, model):
+        self.model = model
+    
+

@@ -3,7 +3,6 @@ import openai
 from enum import Enum
 from pwn import log
 from colorama import Fore, Style
-import pyperclip
 
 
 openai.api_key = os.environ['OPENAI_API_KEY']
@@ -14,6 +13,16 @@ class ChatGPTModel(Enum):
     GPT_3_5_TURBO_16K = 'gpt-3.5-turbo-16k'
     GPT_4 = 'gpt-4'
     GPT_4_32K = 'gpt-4-32k'
+
+
+def get_model(model: str):
+    model_mapper = {
+        'gpt3': ChatGPTModel.GPT_3_5_TURBO,
+        'gpt3-16k': ChatGPTModel.GPT_3_5_TURBO_16K,
+        'gpt4': ChatGPTModel.GPT_4,
+        'gpt4-32k': ChatGPTModel.GPT_4_32K 
+    } 
+    return model_mapper[model]
 
 
 def ask_to_chatgpt(messages, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):

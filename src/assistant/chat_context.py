@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractclassmethod
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any
 from assistant.chatgpt import ChatGPT
 from pwn import log
 
@@ -38,6 +38,10 @@ class ChatContext():
     
     def used_tokens(self):
         return self.chatgpt.tokens
+    
+    def update_model(self, model):
+        self.chatgpt.update_model(model)
+
 
     
 
