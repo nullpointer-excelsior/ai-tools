@@ -1,7 +1,7 @@
 from pwn import log
 import pyperclip
 from assistant.chatgpt import ChatGPT
-from assistant.context import ChatContext, Command
+from assistant.chat_context import ChatContext, Command
 from libs.colored import green_color, yellow_color
 
 
