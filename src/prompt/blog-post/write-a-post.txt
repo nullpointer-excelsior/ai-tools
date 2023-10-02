@@ -1,0 +1,148 @@
+Task: escribe un articulo de ingenieria de sofware en español
+Topic: patron state machine basado en en el ejemplo de codigo encerrado en triple acento grave
+Style: Tecnico
+Tone: Amistoso
+Audience: Expertos en desarrollo de software
+Format: Markdown
+
+```
+
+import { BehaviorSubject } from "rxjs";
+import { filter, map } from 'rxjs/operators';
+
+
+export interface State<T> {
+    name: T;
+    data: any;
+}
+
+export interface Transition<T> {
+    from: T;
+    to: T[];
+}
+
+export interface StateMachineConfig<T> {
+    initialState: State<T>;
+    transitions?: Transition<T>[];
+}
+
+export class InvalidStateError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = 'InvalidStateError'
+        this.stack = ''
+    }
+}
+
+export class StateMachine<T> {
+
+    private currentState: BehaviorSubject<State<T>>;
+    private transitions: Transition<T>[];
+
+    constructor(config: StateMachineConfig<T>) {
+        this.currentState = new BehaviorSubject(config.initialState)
+        this.transitions = config.transitions ? config.transitions : []
+    }
+
+    state() {
+        return this.currentState.asObservable()
+    }
+
+    stateValue(){
+        return this.currentState.getValue()
+    }
+
+    stateFor(stateName: T) {
+        return this.currentState.asObservable().pipe(
+            filter(state => state.name === stateName),
+            map(state => state.data)
+        )
+    }
+
+    transition(state: State<T>) {
+        const currentState = this.currentState.getValue().name
+        const transitionToValidate = this.transitions
+            .filter(t => t.from === currentState)
+            .map(t => t.to)
+            .reduce((result, element) => result.concat(element), [])
+        if (!transitionToValidate.includes(state.name)) {
+            throw new InvalidStateError(`The transition from "${currentState}" to "${state.name}" is invalid. The valid transitions for "${currentState}" are "${transitionToValidate}".`)
+        }
+        this.currentState.next(state)
+    }
+
+}
+
+
+export type QualityControlState = 'factory-proccess' | 'visual-inspection' | 'functional-inspection' | 'approved' | 'rejected'
+
+const config: StateMachineConfig<QualityControlState> = {
+    initialState: {
+        name: 'factory-proccess',
+        data: 'Building product'
+    },
+    transitions: [
+        { from: 'factory-proccess', to: ['visual-inspection'] },
+        { from: 'visual-inspection', to: ['functional-inspection', 'rejected'] },
+        { from: 'functional-inspection', to: ['rejected', 'approved'] },
+        { from: 'rejected', to: ['factory-proccess'] },
+    ]
+}
+
+let productState = new StateMachine<QualityControlState>(config)
+
+/**
+ * Execute transitions by 1 second interval.
+ * @param states 
+ * @returns 
+ */
+const executeTransitions = (states: State<QualityControlState>[]) => {
+    return interval(1000).pipe(
+        take(states.length),
+        map((index) => states[index])
+    )
+}
+
+
+const successTransitions = () => {
+    const transitions: State<QualityControlState>[] = [
+        { name: 'visual-inspection', data: 'Performing visual inspection' },
+        { name: 'functional-inspection', data: 'Performing functional inspection' },
+        { name: 'approved', data: 'Product approved' },
+    ];
+    executeTransitions(transitions)
+        .subscribe((state: State<QualityControlState>) => productState.transition(state));
+}
+
+const failedTransition = () => {
+    const transitions: State<QualityControlState>[] = [
+        { name: 'visual-inspection', data: 'Performing visual inspection' },
+        { name: 'rejected', data: 'Product rejected' },
+    ];
+    executeTransitions(transitions)
+        .subscribe((state: State<QualityControlState>) => productState.transition(state));
+}
+
+const invalidTransitions = () => {
+    const transitions: State<QualityControlState>[] = [
+        { name: 'visual-inspection', data: 'Performing visual inspection' },
+        { name: 'approved', data: 'Product approved' },
+    ];
+    executeTransitions(transitions)
+        .subscribe({
+            next: (state: State<QualityControlState>) => productState.transition(state),
+            error: (err) => console.error(err.message)
+        });
+}
+
+
+// Subscripcion al estado de un producto
+productState
+    .state()
+    .subscribe(state => console.log('Product state', state))
+
+successTransitions()
+// failedTransition()
+// invalidTransitions()
+
+```

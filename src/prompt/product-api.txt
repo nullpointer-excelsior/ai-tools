@@ -1,0 +1,22 @@
+actua como un experti desarrollador en python y en base al siguiente modelo encerrado en triple acento grave de la entidad Producto.
+```
+from pydantic import BaseModel
+from typing import List
+
+app = FastAPI()
+
+# Modelo de datos para un producto
+class Product(BaseModel):
+    sku: str
+    name: str
+    description: str
+    category: str
+    price: float
+    stock: int
+    store: str
+```
+
+crea una funcion basada en el patron specificacion para filtrar una lista de productos de forma dinamica de la siguiente manera:
+1)todos los parametros de la busqueda seran opcionales
+2)se podra aplicar operadores. Para los tipos string seran: "equals","start","contains" y "end". para los tipo numerico seran: "equals", "greater", "greter-than", "lower" y "lower-than"
+3)la funcion aceptara un diccionario tipo **kwargs

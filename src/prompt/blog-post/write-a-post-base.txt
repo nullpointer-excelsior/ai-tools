@@ -1,0 +1,7 @@
+
+Task: Write a blogpost
+Topic: Ingenieria de software
+Style: Technical
+Tone: Friendly
+Audience: Expert audience
+Format: Markdown
