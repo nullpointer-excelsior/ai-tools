@@ -40,13 +40,7 @@ class ChatContext():
     
     def asking_stream(self, message):
         self.add_message({ 'role': 'user', 'content': message })
-        final_message = ''
-        self.status('Escribiendo...')
-        for stream in self.chat_completion_stream(messages=self.messages):
-            print_stream(stream)
-            final_message += stream
-        return final_message
-
+        return self.chat_completion_stream(messages=self.messages)
     
     def add_message(self, message):
         self.messages.append(message)

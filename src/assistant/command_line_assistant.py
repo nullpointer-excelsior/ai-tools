@@ -130,8 +130,10 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
 
             context.status('Pensando...')
             print_stream(f"\n{green_color('[Assistant] ')}")
-            context.asking_stream(user_input)
+            for stream in context.asking_stream(user_input):
+                print_stream(stream)
             context.success("Listo!")
+
 
     except KeyboardInterrupt:
         log.info('Saliendo...')
