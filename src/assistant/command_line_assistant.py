@@ -3,6 +3,7 @@ import pyperclip
 from assistant.chatgpt import ChatGPT
 from assistant.chat_context import ChatContext, Command
 from libs.colored import green_color, yellow_color
+from libs.openai_api import ChatGPTModel
 
 
 class ResetAssistantCommand(Command):
@@ -47,8 +48,7 @@ def command_info(commands):
     """
     
 
-def command_line_assistant(prompt: str, custom_commands: list[Command] = []):
-    
+def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3_5_TURBO, custom_commands: list[Command] = []):
     commands = [
         ResetAssistantCommand(),
         CopyCommand(),
@@ -59,7 +59,7 @@ def command_line_assistant(prompt: str, custom_commands: list[Command] = []):
     context = ChatContext(
         prompt=prompt,
         messages=[{ 'role': 'system', 'content': prompt }],
-        chatgpt=ChatGPT(),
+        chatgpt=ChatGPT(tokens=0, model=model),
         commands=commands
     )
 
