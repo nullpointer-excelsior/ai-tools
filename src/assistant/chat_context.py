@@ -57,7 +57,7 @@ class Command(ABC):
         ...
     
     @abstractclassmethod
-    def action(self, user_input: str, context: ChatContext):
+    def action(self, context: ChatContext, user_input: str):
         ...
 
 

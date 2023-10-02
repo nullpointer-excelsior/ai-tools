@@ -10,7 +10,7 @@ class ResetAssistantCommand(Command):
     name = 'reset'
     description = 'Resetar el maldito asistente.'
 
-    def action(self, user_input: str, context: ChatContext):
+    def action(self, context: ChatContext, user_input: str):
         context.status('Reseteando asistente...')
         context.messages = [{ 'role': 'system', 'content': context.prompt }]
         context.assistant_input = context.chat_completion(messages=context.messages)
@@ -21,7 +21,7 @@ class CopyCommand(Command):
     name = 'copy'
     description = 'Copiar la ultima respuesta al portapapeles.'
 
-    def action(self, user_input: str, context: ChatContext):
+    def action(self, context: ChatContext, user_input: str):
         pyperclip.copy(context.assistant_input)
         context.assistant_input = 'Respuesta copiada al portapapeles!!'
 
@@ -30,7 +30,7 @@ class ChangeModelCommand(Command):
     name = 'model'
     description = 'Actualiza el modelo del chat actual '
 
-    def action(self, user_input: str, context: ChatContext):
+    def action(self, context: ChatContext, user_input: str):
         context.status('Seleccionar modelo')
         model_input = int(input(f"""
         Selecciona uno de los siguientes opciones:
@@ -61,7 +61,7 @@ class HelpCommand(Command):
     name = 'help'
     description = 'Muestra los comandos disponibles.'
 
-    def action(self, user_input: str, context: ChatContext):
+    def action(self, context: ChatContext, user_input: str):
         context.assistant_input = f"\n{command_info(context.commands)}"
 
 
