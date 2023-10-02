@@ -77,6 +77,7 @@ python src/simple_assistant.py
 
 ## TODO
 - [ ] Add english ai documentation
-- [ ] Change model option in cli options
+- [x] Change model option in cli options
 - [ ] blogger assistant 
 - [ ] refactorize chatgpt call functions and chatgpt without call functions
+- [x] command_line_assistant function with stream feature 
