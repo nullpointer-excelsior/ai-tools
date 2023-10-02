@@ -81,3 +81,4 @@ python src/simple_assistant.py
 - [ ] blogger assistant 
 - [ ] refactorize chatgpt call functions and chatgpt without call functions
 - [x] command_line_assistant function with stream feature 
+- [ ] add token usage feature to strema mode

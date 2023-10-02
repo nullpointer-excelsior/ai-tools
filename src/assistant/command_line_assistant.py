@@ -65,6 +65,7 @@ class HelpCommand(Command):
     def action(self, context: ChatContext, user_input: str):
         print(f"\n{command_info(context.commands)}")
 
+
 class DebugCommand(Command):
     name = 'debug'
     description = 'Muestra la configuracion del agente de ChatGPT'
