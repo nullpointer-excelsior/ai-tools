@@ -74,3 +74,9 @@ export OPENAI_API_KEY=""
 python src/simple_assistant.py 
 
 ```
+
+## TODO
+-[ ] Add english ai documentation
+-[ ] Change model option in cli options
+-[ ] blogger assistant 
+-[ ] refactorize chatgpt call functions and chatgpt without call functions
