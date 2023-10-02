@@ -24,6 +24,18 @@ class ChatGPT:
         messages = [{"role": "user", "content": prompt}]
         return self.chat_completion(messages=messages, temperature=temperature)
     
+    def chat_completion_stream(self ,messages, temperature=0):
+        response = openai.ChatCompletion.create(
+            model=self.model.value,
+            messages=messages,
+            temperature=temperature,
+            stream=True
+        )
+        for chunk in response:
+            delta = chunk['choices'][0]['delta']
+            answer = delta.get('content', '')
+            yield answer
+    
 
     def update_model(self, model):
         self.model = model

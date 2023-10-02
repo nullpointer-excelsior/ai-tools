@@ -4,6 +4,7 @@ from assistant.chatgpt import ChatGPT
 from assistant.chat_context import ChatContext, Command
 from libs.colored import cyan_color, green_color, yellow_color
 from libs.openai_api import ChatGPTModel
+from libs.utils import print_stream
 
 
 class ResetAssistantCommand(Command):
@@ -99,11 +100,16 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
         print()
         assistant_progress = log.progress('AI Assistant')
         assistant_progress.status('Iniciando asistente...')
-        assistant_input = context.chat_completion(messages=context.messages)
-        assistant_progress.success('Asistente listo!')
+        assistant_input = ''
         print(command_info(commands))
+        print_stream(green_color('[Assistant] '))
+        for stream in context.chat_completion_stream(messages=context.messages):
+            print_stream(stream)
+
+        assistant_progress.success('Asistente listo!')
+
         while True:
-            user_input = input(f"{green_color('[Assistant] ')}{assistant_input}\n\n{green_color('[User] ')}")
+            user_input = input(f"{assistant_input}\n\n{green_color('[User] ')}")
             print()
             context.progress('Estado chat context')
             # exit command
@@ -123,10 +129,12 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
                 continue
 
             context.status('Pensando...')
-            assistant_input = context.asking(user_input)
+            print_stream(f"\n{green_color('[Assistant] ')}")
+            context.asking_stream(user_input)
             context.success("Listo!")
 
     except KeyboardInterrupt:
         log.info('Saliendo...')
-    log.info(f'Total tokens: {context.used_tokens()}\n')
+    # log.info(f'Total tokens: {context.used_tokens()}\n')
+    log.info('Total tokens: No available in stream mode\n')
 

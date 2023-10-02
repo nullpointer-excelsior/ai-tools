@@ -5,6 +5,8 @@ from typing import Any
 from assistant.chatgpt import ChatGPT
 from pwn import log
 
+from libs.utils import print_stream
+
 @dataclass
 class ChatContext():
     
@@ -27,11 +29,24 @@ class ChatContext():
     def chat_completion(self, messages):
         return self.chatgpt.chat_completion(messages)
     
+    def chat_completion_stream(self, messages):
+        return self.chatgpt.chat_completion_stream(messages)
+    
     def asking(self, message):
         self.add_message({ 'role': 'user', 'content': message })
         answer = self.chat_completion(messages=self.messages)
         self.add_message({ 'role': 'assistant', 'content': answer})
         return answer
+    
+    def asking_stream(self, message):
+        self.add_message({ 'role': 'user', 'content': message })
+        final_message = ''
+        self.status('Escribiendo...')
+        for stream in self.chat_completion_stream(messages=self.messages):
+            print_stream(stream)
+            final_message += stream
+        return final_message
+
     
     def add_message(self, message):
         self.messages.append(message)
