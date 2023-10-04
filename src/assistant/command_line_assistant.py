@@ -1,5 +1,5 @@
 from pwn import log
-import pyperclip
+import pyperclip, os
 from assistant.chatgpt import ChatGPT
 from assistant.chat_context import ChatContext, Command
 from libs.colored import cyan_color, green_color, yellow_color
@@ -39,6 +39,7 @@ class ChangeModelCommand(Command):
             {green_color('2')}) {yellow_color('gpt3-16k')}
             {green_color('3')}) {yellow_color('gpt4')}
             {green_color('4')}) {yellow_color('gpt4-32k')}
+            {green_color('5')}) {yellow_color('salir')}
         """))
         try:
             if model_input == 1:
@@ -49,6 +50,8 @@ class ChangeModelCommand(Command):
                 model = ChatGPTModel.GPT_4
             elif model_input == 4:
                 model = ChatGPTModel.GPT_4_32K
+            elif model_input == 5:
+                return
             else:
                 print(f'Opción {model_input} invalida')
                 return 
@@ -78,8 +81,37 @@ class DebugCommand(Command):
         """)
 
 
+class PromptCommand(Command):
+    name = 'prompt'
+    description = 'Prompts disponibles para ajustar el asistente'
+
+    def action(self, context: ChatContext, user_input: str):
+        prompt_dir = 'src/prompts'
+        prompt_files = [file for file in os.listdir(prompt_dir) if os.path.isfile(os.path.join(prompt_dir, file))]
+        for i, p in enumerate(prompt_files, 1):
+            print(f"{i}) - {p}")
+        select = input("Ingresa el nombre del prompt que deseas:").strip()
+        try:
+            filename = f"{prompt_dir}/{select}"
+            print(filename)
+            print(f'pwd:{os.getcwd()}')
+            with open(filename, 'r') as file_selected:
+                prompt = file_selected.read().strip()
+                context.messages = [{ 'role': 'system', 'content': prompt }]
+                for stream in context.chat_completion_stream(messages=context.messages):
+                    print_stream(stream)
+
+        except FileNotFoundError:
+            print('Invalid filename')
+
+
+def parse_input_to_params(input: str):
+    return input.lower().strip().split(' ')
+
+
 def is_command(user_input: str, command: str):
-    return user_input.lower().strip() == command
+    params = parse_input_to_params(user_input)
+    return params[0] == command
 
 
 def command_info(commands):
@@ -98,7 +130,8 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
         CopyCommand(),
         ChangeModelCommand(),
         HelpCommand(),
-        DebugCommand()
+        DebugCommand(),
+        PromptCommand()
     ]
     commands += custom_commands
 

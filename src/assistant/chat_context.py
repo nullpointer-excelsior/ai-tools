@@ -5,8 +5,6 @@ from typing import Any
 from assistant.chatgpt import ChatGPT
 from pwn import log
 
-from libs.utils import print_stream
-
 @dataclass
 class ChatContext():
     
@@ -57,15 +55,13 @@ class ChatContext():
         self.chatgpt.update_model(model)
 
 
-    
-
-
 @dataclass
 class Command(ABC):
     
     @property
     def name(self) -> str:
         ...
+
     @property
     def description(self) -> str:
         ...
