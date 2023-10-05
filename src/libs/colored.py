@@ -8,3 +8,6 @@ def yellow_color(text):
 
 def cyan_color(text):
     return f'{Fore.CYAN}{text}{Style.RESET_ALL}'
+
+def red_color(text):
+    return f'{Fore.RED}{text}{Style.RESET_ALL}'
