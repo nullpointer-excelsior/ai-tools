@@ -24,7 +24,7 @@ model_mapper = {
               default='gpt3',
               help='Indica el modelo AI a usar')
 def create_assistant(model):
-    command_line_assistant(prompt="Se un util asistente", model=model_mapper[model])
+    command_line_assistant(prompt="Se un util asistente, responde mis consultas de forma clara, resumida y respuesta directa", model=model_mapper[model])
 
 
 if __name__ == "__main__":

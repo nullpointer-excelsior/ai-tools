@@ -46,12 +46,16 @@ def process_text(text, translate, grammar):
     prompt = get_prompt(text, translate, grammar)
     complete_response = ''
     stream_initialized = False
-    for stream in get_completion_stream(prompt):
-        if not stream_initialized:
-            progress.status('Escribiendo...')
-            stream_initialized = True
-        print_stream(stream)
-        complete_response += stream
+    try:
+        for stream in get_completion_stream(prompt):
+            if not stream_initialized:
+                progress.status('Escribiendo...')
+                stream_initialized = True
+            print_stream(stream)
+            complete_response += stream
+    except Exception as err:
+        print(f"\n\n{str(err)}\n")
+
     copy_response(complete_response, progress)
     print('\n')
        
