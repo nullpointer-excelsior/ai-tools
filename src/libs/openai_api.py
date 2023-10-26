@@ -3,7 +3,6 @@ import openai
 from enum import Enum
 from pwn import log
 from colorama import Fore, Style
-import pyperclip
 
 
 openai.api_key = os.environ['OPENAI_API_KEY']
@@ -14,6 +13,16 @@ class ChatGPTModel(Enum):
     GPT_3_5_TURBO_16K = 'gpt-3.5-turbo-16k'
     GPT_4 = 'gpt-4'
     GPT_4_32K = 'gpt-4-32k'
+
+
+def get_model(model: str):
+    model_mapper = {
+        'gpt3': ChatGPTModel.GPT_3_5_TURBO,
+        'gpt3-16k': ChatGPTModel.GPT_3_5_TURBO_16K,
+        'gpt4': ChatGPTModel.GPT_4,
+        'gpt4-32k': ChatGPTModel.GPT_4_32K 
+    } 
+    return model_mapper[model]
 
 
 def ask_to_chatgpt(messages, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):
@@ -51,65 +60,7 @@ def get_completion_stream(prompt, model=ChatGPTModel.GPT_3_5_TURBO, temperature=
     return ask_to_chatgpt_stream(messages=messages, model=model, temperature=temperature)
 
 
-def is_command(user_input: str, command: str):
-    return user_input.lower().strip() == command
-
-
-def print_commands():
-    message = f"""
-    Comandos disponibles:
-
-        [{Fore.GREEN}*{Style.RESET_ALL}] {Fore.YELLOW}exit{Style.RESET_ALL}: Salir del asistente.
-        [{Fore.GREEN}*{Style.RESET_ALL}] {Fore.YELLOW}copy{Style.RESET_ALL}: Copiar la ultima respuesta al portapapeles.
-        [{Fore.GREEN}*{Style.RESET_ALL}] {Fore.YELLOW}reset{Style.RESET_ALL}: Resetea la conversación del asistente.
-    """
-    print(message)
-
-
-def chatgpt_cli(prompt: str):
-    tokens = 0
-    try:
-        print()
-        assistant_progress = log.progress('AI Assistant')
-        assistant_progress.status('Iniciando asistente...')
-        messages = [{ 'role': 'system', 'content': prompt }]
-        response = ask_to_chatgpt(messages)
-        input_message = response['answer']
-        tokens += response['total_token']
-        assistant_progress.success('Asistente listo!')
-        print_commands()
-        while True:
-            user_input = input(f'{Fore.GREEN}\n[Assistant]: {Style.RESET_ALL}{input_message}\n\n{Fore.GREEN}[User]: {Style.RESET_ALL}')
-            print()
-            chat_status = log.progress('Estado chat')
-            # commands
-            if is_command(user_input, 'exit'):
-                break
-            if is_command(user_input, 'copy'):
-                pyperclip.copy(input_message)
-                input_message = 'Respuesta copiada al portapapeles!!'
-                continue
-            if is_command(user_input, 'reset'):
-                chat_status.status('Resetenado conversacion del asistente...')
-                messages = [{ 'role': 'system', 'content': prompt }]
-                response = ask_to_chatgpt(messages)
-                input_message = response['answer']
-                tokens += response['total_token']
-                chat_status.success('Asistente reseteado!')
-                continue
-            chat_status.status('Escribiendo...')
-            messages.append({ 'role': 'user', 'content': user_input })
-            response = ask_to_chatgpt(messages)
-            tokens += response['total_token']
-            chat_status.success("Listo!")
-            messages.append({ 'role': 'assistant', 'content': response['answer']})
-            input_message = response['answer']
-    except KeyboardInterrupt:
-        log.info('Saliendo...')
-    log.info(f'Total tokens: {tokens}\n')
-
-
-def completion_cli(prompt: str):
+def completion_task(prompt: str):
     tokens = 0
     try:
         assistant_progress = log.progress('AI Task')
