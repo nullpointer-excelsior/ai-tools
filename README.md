@@ -36,6 +36,7 @@ Este script de Python permite resumir un texto utilizando ChatGPT y varias opcio
 
 ### Argumentos
 * `text`: El texto que se desea resumir.
+
 ### Opciones
 
 * `--words`, `-w`: El número aproximado de palabras que se desea que tenga el resumen.
@@ -46,6 +47,7 @@ Este script de Python permite resumir un texto utilizando ChatGPT y varias opcio
 * `--markdown`, `-md`: Si se desea que el formato de salida sea en Markdown.
 * `--verbose`, `-v`: Si se desea que el resumen detallado sea mostrado.
 * `--no-clipboard`, `-nc`: Si se desea que el resumen no se copie al portapapeles.
+* `--model`, `-m`: Escoje el modelo GPT a usar las opciones son: `gpt3`, `gpt3-16k`, `gpt4` y `gpt4-32k`
 
 ### Ejemplo
 ```bash
@@ -63,6 +65,10 @@ python src/summarize.py "Este es un ejemplo de texto que se desea resumir" -w 10
 
 Simple asitente sin ningun prompt especial, util para usar chatGPT en la terminal
 
+### Opciones
+
+* `--model`, `-m`: Escoje el modelo GPT a usar las opciones son: `gpt3`, `gpt3-16k`, `gpt4` y `gpt4-32k`
+
 ### Ejemplo
 ```bash
 #!/bin/bash
@@ -75,10 +81,49 @@ python src/simple_assistant.py
 
 ```
 
+## `Blogger de tecnología AI`
+
+Crea un articulo de internet para la herramienta de sitios estaticos `Jekill`. solo debemos proporcionar la ruta de un archivo .md con el contenido del articulo
+
+### Uso
+
+```bash
+python src/blogger.py $PATH_TO_MD_FILE
+```
+
+Esto creara un archivo .md con correcciones gramaticales y metadata para `Jekill`.
+
+## `Corrector de inglés AI`
+
+Corrije y entrega los errores gramaticales de un texto en ingles. el texto correjido lo copiara al portapapeles
+
+### Opciones
+
+* `--model`, `-m`: Escoje el modelo GPT a usar las opciones son: `gpt3`, `gpt3-16k`, `gpt4` y `gpt4-32k`
+* `--traslate`, `-t`: Traduce al inglés el texto
+
+### Uso
+
+```bash
+#!/bin/bash
+
+# no options 
+python src/english.py "My text to correct"
+# with specific model
+python src/english.py -m gpt4 "My text to correct"
+# Translate the given text. The assistant will resolve the language.
+python src/english.py -t "My text to correct"
+
+```
+
 ## TODO
-- [ ] Add english ai documentation
+- [x] Add english and blogger ai documentation
 - [x] Change model option in cli options
-- [ ] blogger assistant 
+- [x] blogger assistant 
 - [ ] refactorize chatgpt call functions and chatgpt without call functions
 - [x] command_line_assistant function with stream feature 
-- [ ] add token usage feature to strema mode
+- [ ] add token usage feature to strem mode
+
+
+
+### Autor: **Benjamín**
