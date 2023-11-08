@@ -1,10 +1,11 @@
+from openai import APIError
 from pwn import log
 import pyperclip, os, sys
 from assistant.chatgpt import ChatGPT
 from assistant.chat_context import ChatContext, Command
 from libs.colored import cyan_color, green_color, red_color, yellow_color
 from libs.openai_api import ChatGPTModel
-from libs.utils import print_stream
+from libs.utils import print_stream, suppress_keyboard_interrupt
 
 
 class ResetAssistantCommand(Command):
@@ -126,6 +127,7 @@ def command_info(commands):
     """
     
 
+@suppress_keyboard_interrupt
 def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3_5_TURBO, custom_commands: list[Command] = []):
     commands = [
         ResetAssistantCommand(),
@@ -144,47 +146,44 @@ def command_line_assistant(prompt: str, model: ChatGPTModel = ChatGPTModel.GPT_3
         commands=commands
     )
 
-    try:
+    print()
+    assistant_progress = log.progress('AI Assistant')
+    assistant_progress.status('Iniciando asistente...')
+    assistant_input = ''
+    print(command_info(commands))
+    print_stream(green_color('[Assistant] '))
+    for stream in context.chat_completion_stream(messages=context.messages):
+        print_stream(stream)
+
+    assistant_progress.success('Asistente listo!')
+
+    while True:
+        user_input = input(f"\n\n{green_color('[User] ')}")
         print()
-        assistant_progress = log.progress('AI Assistant')
-        assistant_progress.status('Iniciando asistente...')
-        assistant_input = ''
-        print(command_info(commands))
-        print_stream(green_color('[Assistant] '))
-        for stream in context.chat_completion_stream(messages=context.messages):
-            print_stream(stream)
-
-        assistant_progress.success('Asistente listo!')
-
-        while True:
-            user_input = input(f"\n\n{green_color('[User] ')}")
-            print()
-            context.progress('Estado chat context')
-            # exit command
-            if is_command(user_input, 'exit'):
+        context.progress('Estado chat context')
+        # exit command
+        if is_command(user_input, 'exit'):
+            break
+        # custom commands
+        command_executed = False
+        for cmd in commands:
+            if is_command(user_input, cmd.name):
+                context.assistant_input = assistant_input
+                cmd.action(user_input=user_input, context=context)
+                assistant_input = context.assistant_input
+                command_executed = True
+                context.success(f'Comando {cyan_color(cmd.name)} ejecutado.')
                 break
-            # custom commands
-            command_executed = False
-            for cmd in commands:
-                if is_command(user_input, cmd.name):
-                    context.assistant_input = assistant_input
-                    cmd.action(user_input=user_input, context=context)
-                    assistant_input = context.assistant_input
-                    command_executed = True
-                    context.success(f'Comando {cyan_color(cmd.name)} ejecutado.')
-                    break
-            if command_executed:
-                continue
+        if command_executed:
+            continue
 
-            context.status('Pensando...')
-            print_stream(f"\n{green_color('[Assistant] ')}")
-            for st in context.asking_stream(user_input):
-                print_stream(f"{cyan_color(st)}")
-            context.success("Listo!")
+        context.status('Pensando...')
+        print_stream(f"\n{green_color('[Assistant] ')}")
+        for st in context.asking_stream(user_input):
+            print_stream(f"{cyan_color(st)}")
+        context.success("Listo!")
 
-
-    except KeyboardInterrupt:
-        log.info('Saliendo...')
+        
     # log.info(f'Total tokens: {context.used_tokens()}\n')
     log.info('Total tokens: No available in stream mode\n')
 
