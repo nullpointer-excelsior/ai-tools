@@ -1,6 +1,8 @@
 import click, pyperclip
 from pwn import log
-from libs.openai_api import get_completion_stream
+from libs.cli import model_option
+from libs.colored import cyan_color
+from libs.openai_api import get_completion_stream, get_model
 from libs.utils import print_stream
 import sys, select
 
@@ -28,7 +30,8 @@ def copy_response(text: str, progress):
 @click.command()
 @click.argument('text', default=None, required=False)
 @click.option('--translate', '-t', is_flag=True, help='Traduce al ingles el texto', default=False)
-def translate(text, translate):
+@model_option
+def translate(text, translate, model):
     """
     Resume un texto con ChatGPT y diversas opciones.
     """
@@ -39,13 +42,13 @@ def translate(text, translate):
             log.error('No se ha proporcionado ningún texto.')
             return
     print()
-    progress = log.progress('Openai ChatGPT')
+    progress = log.progress(f'OpenAI {cyan_color(model)}')
     progress.status('Conectando...')
     print()
     prompt = get_assistant_prompt(text) if not translate else get_translate_prompt(text)
     complete_response = ''
     stream_initialized = False
-    for stream in get_completion_stream(prompt):
+    for stream in get_completion_stream(prompt=prompt, model=get_model(model)):
         if not stream_initialized:
             progress.status('Escribiendo...')
             stream_initialized = True

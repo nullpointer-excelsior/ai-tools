@@ -1,7 +1,8 @@
 import click, pyperclip
 from pwn import log
+from libs.cli import model_option
 from libs.colored import cyan_color
-from libs.openai_api import get_completion_stream
+from libs.openai_api import get_completion_stream, get_model
 from libs.utils import print_stream
 from colorama import Fore, Style
 import sys, select
@@ -77,7 +78,8 @@ def get_summary_verbose(prompt):
 @click.option('--verbose','-v', is_flag=True, help='Muestra el resumen detallado')
 @click.option('--no-clipboard', '-nc', is_flag=True, help='No copia al clipboard')
 @click.option('--translate', '-tr', is_flag=True, help='Traduce si es necesario')
-def text_processor(text, words, sentences, tone, audience, style, markdown, verbose, no_clipboard, translate):
+@model_option
+def text_processor(text, words, sentences, tone, audience, style, markdown, verbose, no_clipboard, translate, model):
     """
     Resume un texto con ChatGPT y diversas opciones.
     """
@@ -97,7 +99,7 @@ def text_processor(text, words, sentences, tone, audience, style, markdown, verb
             pyperclip.copy(summary)
             log.info('Resumen copiado al portapapeles!\n\n')
     else:
-        stream = get_completion_stream(prompt=prompt)
+        stream = get_completion_stream(prompt=prompt,model=get_model(model))
         for s in stream:
             print_stream(s)
         print()
