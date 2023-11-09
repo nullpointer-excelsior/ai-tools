@@ -1,4 +1,5 @@
 import sys
+import sys, select
 from pwn import log
 
 def print_stream(value):
@@ -17,3 +18,18 @@ def suppress_keyboard_interrupt(func):
         except KeyboardInterrupt:
             log.info('Saliendo...')
     return wrapper
+
+
+def read_argument():
+    return sys.argv[1] if len(sys.argv) > 1 else None
+
+
+def read_stdin():
+    if select.select([sys.stdin,],[],[],0.0)[0]:
+        return sys.stdin.read().strip()
+    return None
+
+
+def read_file(filename):
+    with open(filename, "r") as file:
+        return file.read()

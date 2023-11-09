@@ -1,8 +1,8 @@
-import sys, select, re
+import re
 from datetime import datetime
 from pwn import log
 from libs.openai_api import ChatGPTModel, get_completion
-from libs.utils import truncate_text
+from libs.utils import read_argument, read_file, read_stdin, truncate_text
 
 CORRECT_TEXT_PROMPT = """
 Corrige gramaticalmente el siguiente artículo encerrado en triple acento grave, el cual está en formato markdown. Ignora los bloques de código, pero deben estar incluidos en el artículo final.
@@ -62,21 +62,6 @@ tags: {tags}
 {content}
 
 """
-
-
-def read_argument():
-    return sys.argv[1] if len(sys.argv) > 1 else None
-
-
-def read_stdin():
-    if select.select([sys.stdin,],[],[],0.0)[0]:
-        return sys.stdin.read().strip()
-    return None
-
-
-def read_file(filename):
-    with open(filename, "r") as file:
-        return file.read()
 
 
 def read_content():
