@@ -30,7 +30,7 @@ def copy_response(text, progress):
 @click.argument('text', default=None, required=False)
 @click.option('--translate', '-t', is_flag=True,  help='Traduce el texto aingles o español')
 @click.option('--grammar', '-g', is_flag=True,  help='Corrije el texto gramaticalmente')
-@model_option
+@model_option()
 def process_text(text, translate, grammar, model):
     """
     Operaciones básicas con textos con ChatGPT

@@ -30,7 +30,7 @@ def copy_response(text: str, progress):
 @click.command()
 @click.argument('text', default=None, required=False)
 @click.option('--translate', '-t', is_flag=True, help='Traduce al ingles el texto', default=False)
-@model_option
+@model_option()
 def translate(text, translate, model):
     """
     Resume un texto con ChatGPT y diversas opciones.

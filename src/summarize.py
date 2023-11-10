@@ -78,7 +78,7 @@ def get_summary_verbose(prompt):
 @click.option('--verbose','-v', is_flag=True, help='Muestra el resumen detallado')
 @click.option('--no-clipboard', '-nc', is_flag=True, help='No copia al clipboard')
 @click.option('--translate', '-tr', is_flag=True, help='Traduce si es necesario')
-@model_option
+@model_option()
 def text_processor(text, words, sentences, tone, audience, style, markdown, verbose, no_clipboard, translate, model):
     """
     Resume un texto con ChatGPT y diversas opciones.
