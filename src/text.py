@@ -8,7 +8,7 @@ import sys, select
 class InvalidOption(Exception):
     pass
 
-def get_prompt(text, translate, grammar):
+def get_prompt(text, translate, grammar, orthography):
     if translate:
         return f"""
             Traduce el siguiente texto encerrado entre triple acento grave.
@@ -18,7 +18,11 @@ def get_prompt(text, translate, grammar):
         """
     if grammar:
         return f"""
-        Corrije gramaticalmente el siguiente texto encerrado en triple acento grave. ```{text}```
+        Corrije gramaticalmente el siguiente texto encerrado en triple acento grave. ```{text}```, no debes devolver el texto con el triple acento grave.
+        """
+    if orthography:
+        return f"""
+        Corrije ortograficamente el siguiente texto encerrado en triple acento grave. ```{text}```
         """
     raise InvalidOption('No arguments given')
 
@@ -30,8 +34,9 @@ def copy_response(text, progress):
 @click.argument('text', default=None, required=False)
 @click.option('--translate', '-t', is_flag=True,  help='Traduce el texto aingles o español')
 @click.option('--grammar', '-g', is_flag=True,  help='Corrije el texto gramaticalmente')
+@click.option('--orthography', '-o', is_flag=True,  help='Corrije el texto ortograficamente')
 @model_option()
-def process_text(text, translate, grammar, model):
+def process_text(text, translate, grammar, orthography, model):
     """
     Operaciones básicas con textos con ChatGPT
     """
@@ -45,7 +50,7 @@ def process_text(text, translate, grammar, model):
     progress = log.progress('Openai ChatGPT')
     progress.status('Conectando...')
     print()
-    prompt = get_prompt(text, translate, grammar)
+    prompt = get_prompt(text, translate, grammar, orthography)
     complete_response = ''
     stream_initialized = False
     try:

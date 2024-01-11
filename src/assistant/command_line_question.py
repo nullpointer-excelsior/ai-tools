@@ -17,7 +17,7 @@ def ask_to_chatgpt(model='gpt3', prompt="Eres un util asistente. Responderas de 
     @click.command(help=help)
     @click.argument('argument', default=None, required=False)
     @model_option(model)
-    @click.option('--temperature', '-t', type=int, help='Temperatura del modelo. Entre 0 y 2. Los valores más altos como 0.8 harán que la salida sea más aleatoria, mientras que los valores más bajos como 0.2 la harán más enfocada y determinista.', default=0)
+    @click.option('--temperature', '-t', type=float, help='Temperatura del modelo. Entre 0 y 2. Los valores más altos como 0.8 harán que la salida sea más aleatoria, mientras que los valores más bajos como 0.2 la harán más enfocada y determinista.', default=0)
     def cli(argument, model, temperature):
         content = argument if argument is not None else read_stdin()
         content = read_file_or_get_content(content)
@@ -31,6 +31,7 @@ def ask_to_chatgpt(model='gpt3', prompt="Eres un util asistente. Responderas de 
             complete_response += stream
         print()
         pyperclip.copy(complete_response)
+        return complete_response
     
     return cli
 

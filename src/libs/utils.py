@@ -33,3 +33,9 @@ def read_stdin():
 def read_file(filename):
     with open(filename, "r") as file:
         return file.read()
+    
+
+def read_content(filename_input = read_argument()):
+    if filename_input is None:
+        return read_stdin()
+    return read_file(filename_input)
