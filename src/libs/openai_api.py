@@ -9,23 +9,25 @@ openai.api_key = os.environ['OPENAI_API_KEY']
 
 
 class ChatGPTModel(Enum):
-    GPT_3_5_TURBO = 'gpt-3.5-turbo-1106'
-    GPT_3_5_TURBO_16K = 'gpt-3.5-turbo-16k'
+    GPT_3_5_TURBO = 'gpt-3.5-turbo'
     GPT_4 = 'gpt-4'
-    GPT_4_32K = 'gpt-4-32k'
+    GPT_4o = 'gpt-4o'
+    GPT_4oM = 'gpt-4o-mini'
+    GPT_4_TURBO = 'gpt-4-turbo'
 
 
 def get_model(model: str):
     model_mapper = {
         'gpt3': ChatGPTModel.GPT_3_5_TURBO,
-        'gpt3-16k': ChatGPTModel.GPT_3_5_TURBO_16K,
         'gpt4': ChatGPTModel.GPT_4,
-        'gpt4-32k': ChatGPTModel.GPT_4_32K 
+        'gpt4t': ChatGPTModel.GPT_4_TURBO,
+        'gpt4o': ChatGPTModel.GPT_4o,
+        'gpt4om': ChatGPTModel.GPT_4oM
     } 
     return model_mapper[model]
 
 
-def ask_to_chatgpt(messages, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):
+def ask_to_chatgpt(messages, model=ChatGPTModel.GPT_4oM, temperature=0):
     response = openai.ChatCompletion.create(
         model=model.value,
         messages=messages,
@@ -37,12 +39,12 @@ def ask_to_chatgpt(messages, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):
     }
 
 
-def get_completion(prompt, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0): 
+def get_completion(prompt, model=ChatGPTModel.GPT_4oM, temperature=0): 
     messages = [{"role": "user", "content": prompt}]
     return ask_to_chatgpt(messages=messages, model=model, temperature=temperature)
 
 
-def ask_to_chatgpt_stream(messages, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):
+def ask_to_chatgpt_stream(messages, model=ChatGPTModel.GPT_4oM, temperature=0):
     response = openai.ChatCompletion.create(
         model=model.value,
         messages=messages,
@@ -55,7 +57,7 @@ def ask_to_chatgpt_stream(messages, model=ChatGPTModel.GPT_3_5_TURBO, temperatur
         yield answer
 
 
-def get_completion_stream(prompt, model=ChatGPTModel.GPT_3_5_TURBO, temperature=0):
+def get_completion_stream(prompt, model=ChatGPTModel.GPT_4oM, temperature=0):
     messages = [{"role": "user", "content": prompt}]
     return ask_to_chatgpt_stream(messages=messages, model=model, temperature=temperature)
 

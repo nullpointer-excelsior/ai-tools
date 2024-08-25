@@ -1,11 +1,12 @@
 import click
 
-def model_option(model='gpt3'):
+def model_option(model='gpt4om'):
     model_choices= [
         'gpt3',
-        'gpt3-16k',
         'gpt4',
-        'gpt4-32k'
+        'gpt4t',
+        'gpt4o',
+        'gpt4om'
     ]
     def decorator(wrapped_function):
         
